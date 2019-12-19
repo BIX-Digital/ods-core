@@ -43,13 +43,12 @@ if ! oc project ${NAMESPACE}; then
 fi
 
 echo "Applying Tailorfile to project '${NAMESPACE}'"
-cd ${BASE_DIR}/ods-core/jenkins/ocp-config
-${TAILOR} update ${FORCE} --context-dir=${BASH_SOURCE%/*}/../ods-core/jenkins/ocp-config --non-interactive
+${TAILOR} update ${FORCE} --context-dir=${BASH_SOURCE%/*}/../jenkins/ocp-config --non-interactive
 
 echo "Start Jenkins Builds"
-oc start-build -n cd jenkins-master --follow
-oc start-build -n cd jenkins-slave-base --follow
-oc start-build -n cd jenkins-webhook-proxy --follow
+oc start-build -n ${NAMESPACE} jenkins-master --follow
+oc start-build -n ${NAMESPACE} jenkins-slave-base --follow
+oc start-build -n ${NAMESPACE} jenkins-webhook-proxy --follow
 
 
 
