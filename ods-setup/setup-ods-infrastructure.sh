@@ -14,7 +14,8 @@ function usage {
 }
 TAILOR="tailor"
 NAMESPACE="cd"
-
+REPOSITORY=""
+REF=""
 while [[ "$#" -gt 0 ]]; do case $1 in
 
    -v|--verbose) set -x;;
@@ -28,6 +29,12 @@ while [[ "$#" -gt 0 ]]; do case $1 in
 
    -n=*|--namespace=*) NAMESPACE="${1#*=}";;
    -n|--namespace) NAMESPACE="$2"; shift;;
+
+   -r=*|--ods-base-repository=*) REPOSITORY="${1#*=}";;
+   -r|--ods-base-repository) REPOSITORY="$2"; shift;;
+
+   -b=*|--ods-ref=*) REF="${1#*=}";;
+   -b|--ods-ref) REF="$2"; shift;;
 
    *) echo "Unknown parameter passed: $1"; usage; exit 1;;
  esac; shift; done
@@ -43,12 +50,18 @@ if ! oc project ${NAMESPACE}; then
 fi
 
 echo "Applying Tailorfile to project '${NAMESPACE}'"
-${TAILOR} update ${FORCE} --context-dir=${BASH_SOURCE%/*}/../jenkins/ocp-config --non-interactive
+
+if [ ! -z "${REF}" ]; then
+REF="--param=ODS_GIT_REF=${REF}"
+fi
+
+if [ ! -z "${REPOSITORY}" ]; then
+REPOSITORY="--param=REPO_BASE=${REPOSITORY}"
+fi
+
+${TAILOR} update ${FORCE} --context-dir=${BASH_SOURCE%/*}/../jenkins/ocp-config --non-interactive -n ${NAMESPACE} ${REF} ${REPOSITORY}
 
 echo "Start Jenkins Builds"
 oc start-build -n ${NAMESPACE} jenkins-master --follow
 oc start-build -n ${NAMESPACE} jenkins-slave-base --follow
 oc start-build -n ${NAMESPACE} jenkins-webhook-proxy --follow
-
-
-
