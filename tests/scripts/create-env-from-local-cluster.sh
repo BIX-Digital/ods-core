@@ -8,6 +8,11 @@ function usage() {
   exit
 }
 
+URL=$(oc config view --minify -o jsonpath='{.clusters[*].cluster.server}')
+if [ ${URL} != "https://127.0.0.1:8443" ]; then
+    echo "You are not in a local cluster. Stopping now!!!"
+fi
+
 while [[ "$#" -gt 0 ]]; do case $1 in
   -b=*|--base-oc-dir=*) BASE_OC_DIR="${1#*=}";;
   -b|--base-oc-dir) BASE_OC_DIR="$2"; shift;;
@@ -127,8 +132,8 @@ echo "#####     BitBucket     #####" >> ${OUTPUT}
 echo "#####-#####-#####-#####-#####" >> ${OUTPUT}
 echo "" >> ${OUTPUT}
 
-BITBUCKET_HOST=bitbucket-cd.${SUBDOMAIN}
-REPO_BASE=https://bitbucket-cd.${SUBDOMAIN}/scm
+BITBUCKET_HOST=172.30.0.1:8080
+REPO_BASE=http://${BITBUCKET_HOST}/scm
 
 CD_USER_ID=cd_user
 CD_USER_ID_B64=$(echo -n "${CD_USER_ID}" | base64)

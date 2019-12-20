@@ -10,6 +10,8 @@ function usage {
    printf "\t-v|--verbose\tVerbose output\n"
    printf "\t-t|--tailor\tChanges the executable of tailor. Default: tailor\n"
    printf "\t-n|--namespace\tChanges the default namespace. Default: cd\n"
+   printf "\t-r|--ods-base-repository\tODS base repository. Overrides default in settings file\n"
+   printf "\t-b|--ods-ref\tODS reference in repository. Overrides default in settings file\n"
 
 }
 TAILOR="tailor"
