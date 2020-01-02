@@ -9,10 +9,6 @@ while [[ "$#" -gt 0 ]]; do case $1 in
 
    -h|--help) usage; exit 0;;
 
-   -n=*|--namespace=*) NAMESPACE="${1#*=}";;
-   -n|--namespace) NAMESPACE="$2"; shift;;
-
-
    *) echo "Unknown parameter passed: $1"; usage; exit 1;;
  esac; shift; done
 
@@ -21,9 +17,10 @@ if [ ${URL} != "https://127.0.0.1:8443" ]; then
     echo "You are not in a local cluster. Stopping now!!!"
 fi
 
-if ! oc project ${NAMESPACE}; then
-    echo "Project '${NAMESPACE}' does not exists."    
+if docker ps -a --format "{{.Names}}" | grep mockbucket; then
+    docker rm mockbucket --force
 fi
+
 
 source ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 docker run -d -p "8080:8080" \

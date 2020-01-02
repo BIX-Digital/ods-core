@@ -13,29 +13,21 @@ if [ ! -d ${BASH_SOURCE%/*}/../../ods-config ]; then
 fi
 ${BASH_SOURCE%/*}/create-env-from-local-cluster.sh --output ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 
-NAMSPACE="cd"
+NAMSPACE="ods"
 REF="ci/cd"
 
 if ! oc whoami; then
     echo "You must be logged in to the OC Cluster"
 fi
 
-if oc project cd; then
+if oc project ${NAMSPACE}; then
     oc delete project ${NAMSPACE}
-fi
-
-if docker ps -a --format "{{.Names}}" | grep mockbucket; then
-    docker rm mockbucket --force
-fi
-
-if git remote -v | grep mockbucket; then
-    git remote remove mockbucket
 fi
 
 ${BASH_SOURCE%/*}/../../ods-setup/setup-ods-project.sh --verbose --force --namespace ${NAMSPACE}
 
-${BASH_SOURCE%/*}/deploy-mocks.sh --namespace ${NAMSPACE} --verbose
+${BASH_SOURCE%/*}/deploy-mocks.sh  --verbose
 sleep 10 # Waiting for service to boot up
-${BASH_SOURCE%/*}/setup-mocked-ods-repo.sh --namespace ${NAMSPACE} --ods-ref ${REF} --verbose
+${BASH_SOURCE%/*}/setup-mocked-ods-repo.sh --ods-ref ${REF} --verbose
 
-${BASH_SOURCE%/*}/../../ods-setup/setup-ods-infrastructure.sh --force --verbose --ods-ref ${REF}
+${BASH_SOURCE%/*}/../../ods-setup/setup-jenkins-images.sh --namespace ${NAMSPACE} --force --verbose --ods-ref ${REF}

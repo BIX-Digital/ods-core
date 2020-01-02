@@ -27,6 +27,7 @@ urlencode() {
 REF=""
 NAMESPACE=""
 
+
 URL=$(oc config view --minify -o jsonpath='{.clusters[*].cluster.server}')
 if [ ${URL} != "https://127.0.0.1:8443" ]; then
     echo "You are not in a local cluster. Stopping now!!!"
@@ -38,23 +39,19 @@ while [[ "$#" -gt 0 ]]; do case $1 in
    
    -h|--help) usage; exit 0;;
 
-   -n=*|--namespace=*) NAMESPACE="${1#*=}";;
-   -n|--namespace) NAMESPACE="$2"; shift;;
-
-
    -b=*|--ods-ref=*) REF="${1#*=}";;
    -b|--ods-ref) REF="$2"; shift;;
 
    *) echo "Unknown parameter passed: $1"; usage; exit 1;;
  esac; shift; done
 
+if git remote -v | grep mockbucket; then
+    git remote remove mockbucket
+fi
+
+
 if [ -z "${REF}" ]; then 
     echo "Reference --ods-ref must be provided"
-    exit 1
-fi 
-
-if [ -z "${NAMESPACE}" ]; then 
-    echo "Namespace of the mocks --namespace must be provided"
     exit 1
 fi 
 

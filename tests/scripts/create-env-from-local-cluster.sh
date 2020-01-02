@@ -34,8 +34,9 @@ fi
 
 SUBDOMAIN=$(grep -A 1 routingConfig "${BASE_OC_DIR}/openshift-apiserver/master-config.yaml" | tail -n1 | awk '{print $2}')
 
-echo "ODS_IMAGE_TAG=latest" > ${OUTPUT}
-echo "ODS_IMAGE_TAG=production" >> ${OUTPUT}
+SUBDOMAIN="172.30.0.1.nip.io"
+
+echo "ODS_IMAGE_TAG=test" > ${OUTPUT}
 echo "" >> ${OUTPUT}
 echo "#####-#####-#####-#####-#####" >> ${OUTPUT}
 echo "#####       NEXUS       #####" >> ${OUTPUT}
@@ -164,8 +165,9 @@ echo "#####     OpenShift     #####" >> ${OUTPUT}
 echo "#####-#####-#####-#####-#####" >> ${OUTPUT}
 echo "" >> ${OUTPUT}
 
-DOCKER_REGISTRY=172.30.1.1:5000
+DOCKER_REGISTRY=172.30.0.1:5000
 APP_DNS="${SUBDOMAIN}"
+APP_DNS_PORT=8443
 TARGET_HOSTS=
 OPENSHIFT_API_HOST=https://127.0.0.1:8443
 OPENSHIFT_CONSOLE_HOST=https://127.0.0.1:8443
@@ -175,6 +177,7 @@ PIPELINE_TRIGGER_SECRET_B64=$(echo -n "${PIPELINE_TRIGGER_SECRET}" | base64)
 
 echo "DOCKER_REGISTRY=${DOCKER_REGISTRY}" >> ${OUTPUT}
 echo "APP_DNS=${APP_DNS}" >> ${OUTPUT}
+echo "APP_DNS_PORT=${APP_DNS_PORT}" >> ${OUTPUT}
 echo "TARGET_HOSTS=${TARGET_HOSTS}" >> ${OUTPUT}
 echo "OPENSHIFT_API_HOST=${OPENSHIFT_API_HOST}" >> ${OUTPUT}
 echo "OPENSHIFT_CONSOLE_HOST=${OPENSHIFT_CONSOLE_HOST}" >> ${OUTPUT}
