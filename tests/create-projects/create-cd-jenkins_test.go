@@ -53,6 +53,7 @@ func TestCreateJenkinsWithOutSecret(t *testing.T) {
 
 func TestCreateJenkins(t *testing.T) {
 	_ = utils.RemoveAllTestOCProjects()
+	odsNamespace := "ods"
 	stdout, stderr, err := utils.RunScriptFromBaseDir("create-projects/create-projects.sh", []string{}, utils.PROJECT_ENV_VAR)
 	if err != nil {
 		t.Fatalf(
@@ -60,9 +61,17 @@ func TestCreateJenkins(t *testing.T) {
 			stdout,
 			stderr)
 	}
-	user := base64.StdEncoding.EncodeToString([]byte("myuser"))
-	secret := base64.StdEncoding.EncodeToString([]byte("mysecret"))
-	stdout, stderr, err = utils.RunScriptFromBaseDir("create-projects/create-cd-jenkins.sh", []string{"--force", "--verbose"},
+
+	values,err := utils.ReadValues()
+	if err != nil {
+		t.Fatalf(
+			"Could not read ods-core.env")
+	}
+	
+	user := values["CD_USER_ID_B64"]
+	secret := values["PIPELINE_TRIGGER_SECRET_B64"]
+
+	stdout, stderr, err = utils.RunScriptFromBaseDir("create-projects/create-cd-jenkins.sh", []string{"--force", "--verbose",  "--ods-namespace", odsNamespace},
 		utils.PROJECT_ENV_VAR,
 		"CD_USER_TYPE=general",
 		fmt.Sprintf("CD_USER_ID_B64=%s", user),
@@ -81,6 +90,7 @@ func TestCreateJenkins(t *testing.T) {
     stdout, stderr, err = utils.RunCommandWithWorkDir("tailor", []string{"status", "--force", "--reveal-secrets", "-n", utils.PROJECT_NAME_CD,
 		fmt.Sprintf("--param=PROJECT=%s", utils.PROJECT_NAME),
 		fmt.Sprintf("--param=CD_USER_ID_B64=%s", user),
+		fmt.Sprintf("--param=NAMESPACE=%s", odsNamespace),
 		"--selector", "template=cd-jenkins-template",
 		fmt.Sprintf("--param=%s", fmt.Sprintf("PROXY_TRIGGER_SECRET_B64=%s", secret))}, dir)
 	if err != nil {

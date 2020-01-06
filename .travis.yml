@@ -24,7 +24,7 @@ matrix:
                 - wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
                 - tar -xzvf openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
                 - export PATH=$PATH:$PWD/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit
-                - "sudo cat /etc/docker/daemon.json | jq '. + {\"bip\": \"172.30.0.1/16\", \"default-address-pools\": [{\"base\":\"172.30.0.0/16\",\"size\":16}], \"insecure-registries\": [\"172.30.0.0/16\"]}' | sudo tee /etc/docker/daemon.json"
+                - "sudo cat /etc/docker/daemon.json | jq '. + {\"bip\": \"172.17.0.1/16\", \"default-address-pools\": [{\"base\":\"172.17.0.0/16\",\"size\":16}], \"insecure-registries\": [\"172.30.0.0/16\"]}' | sudo tee /etc/docker/daemon.json"
                 - sudo cat /etc/docker/daemon.json
                 - sudo sed '1inameserver 8.8.8.8' /etc/resolv.conf
                 - cat /etc/resolv.conf
@@ -32,7 +32,7 @@ matrix:
                 - curl -LO "https://github.com/opendevstack/tailor/releases/download/v0.11.0/tailor-linux-amd64"
                 - chmod +x tailor-linux-amd64
                 - sudo mv tailor-linux-amd64 /usr/local/bin/tailor
-                - oc cluster up --base-dir=${HOME}/openshift.local.clusterup
+                - oc cluster up --base-dir=${HOME}/openshift.local.clusterup --routing-suffix 172.17.0.1.nip.io --public-hostname 172.17.0.1
                 - oc cluster status
                 - oc login -u system:admin
                 - mkdir -p ods-config

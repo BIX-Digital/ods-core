@@ -57,9 +57,15 @@ fi
 
 source ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 
-ODS_GIT_REF=tmp/test
-
 # git checkout -b "${REF}"
 git remote add mockbucket http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-core.git
 git -c http.sslVerify=false push mockbucket --set-upstream "$(git rev-parse --abbrev-ref HEAD):${REF}"
 git remote remove mockbucket
+
+mkdir -p "${HOME}/ods-configuration"
+git -C "${HOME}/ods-configuration" init
+cp ${BASH_SOURCE%/*}/../../ods-config/ods-core.env ${HOME}/ods-configuration
+git -C "${HOME}/ods-configuration" add ods-core.env
+git -C "${HOME}/ods-configuration" commit -m "Initial Commit"
+git -C "${HOME}/ods-configuration" remote add mockbucket http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-configuration.git
+git -C "${HOME}/ods-configuration" -c http.sslVerify=false push mockbucket --set-upstream "$(git -C "${HOME}/ods-configuration" rev-parse --abbrev-ref HEAD):${REF}"

@@ -33,9 +33,7 @@ if [[ -z "${BASE_OC_DIR}" && ! -d "${BASE_OC_DIR}" ]]; then
 fi
 
 SUBDOMAIN=$(grep -A 1 routingConfig "${BASE_OC_DIR}/openshift-apiserver/master-config.yaml" | tail -n1 | awk '{print $2}')
-
-SUBDOMAIN="172.30.0.1.nip.io"
-
+REGISTRY_IP=172.30.1.1
 echo "ODS_IMAGE_TAG=test" > ${OUTPUT}
 echo "" >> ${OUTPUT}
 echo "#####-#####-#####-#####-#####" >> ${OUTPUT}
@@ -133,7 +131,7 @@ echo "#####     BitBucket     #####" >> ${OUTPUT}
 echo "#####-#####-#####-#####-#####" >> ${OUTPUT}
 echo "" >> ${OUTPUT}
 
-BITBUCKET_HOST=172.30.0.1:8080
+BITBUCKET_HOST=172.17.0.1:8080
 REPO_BASE=http://${BITBUCKET_HOST}/scm
 
 CD_USER_ID=cd_user
@@ -165,7 +163,7 @@ echo "#####     OpenShift     #####" >> ${OUTPUT}
 echo "#####-#####-#####-#####-#####" >> ${OUTPUT}
 echo "" >> ${OUTPUT}
 
-DOCKER_REGISTRY=172.30.0.1:5000
+DOCKER_REGISTRY=${REGISTRY_IP}:5000
 APP_DNS="${SUBDOMAIN}"
 APP_DNS_PORT=8443
 TARGET_HOSTS=
