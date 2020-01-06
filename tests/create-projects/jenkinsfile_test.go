@@ -83,21 +83,29 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 	time.Sleep(10 * time.Second)
 	build, err := buildClient.Builds("prov-cd").Get(fmt.Sprintf("ods-corejob-create-project-%s-ci-cd-1", utils.PROJECT_NAME), metav1.GetOptions{})
 	count := 0
-	for (err != nil || build.Status.Phase == v1.BuildPhaseNew || build.Status.Phase == v1.BuildPhasePending || build.Status.Phase == v1.BuildPhaseRunning) && count < 60 {
+	max := 120
+	for (err != nil || build.Status.Phase == v1.BuildPhaseNew || build.Status.Phase == v1.BuildPhasePending || build.Status.Phase == v1.BuildPhaseRunning) && count < max {
 		build, err = buildClient.Builds("prov-cd").Get(fmt.Sprintf("ods-corejob-create-project-%s-ci-cd-1", utils.PROJECT_NAME), metav1.GetOptions{})
 		time.Sleep(2 * time.Second)
+		t.Logf("Waiting for build. Current status: %s", build.Status.Phase)
 		count++
 	}
 
-	if count >= 60 || build.Status.Phase != v1.BuildPhaseComplete {
+	if count >= max || build.Status.Phase != v1.BuildPhaseComplete {
 		stdout, stderr, _ := utils.RunScriptFromBaseDir(
 			"tests/scripts/utils/print-jenkins-log.sh",
-			[]string{fmt.Sprintf("ods-corejob-create-project-%s-ci-cd-1")},
-			utils.PROJECT_ENV_VAR)
+			[]string{fmt.Sprintf("ods-corejob-create-project-%s-ci-cd-1", utils.PROJECT_NAME)})
+		if count >= max {
+			t.Fatalf(
+				"Timeout during build: \nStdOut: %s\nStdErr: %s",
+				stdout,
+				stderr)
+		} else {
 		t.Fatalf(
 			"Error during build: \nStdOut: %s\nStdErr: %s",
 			stdout,
 			stderr)
+		}
 
 	}
 	client, err := projectClientV1.NewForConfig(config)

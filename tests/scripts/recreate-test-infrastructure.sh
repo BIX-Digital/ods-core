@@ -17,7 +17,7 @@ if [ ! -d ${BASH_SOURCE%/*}/../../ods-config ]; then
     mkdir -p ${BASH_SOURCE%/*}/../../ods-config
 fi
 
-${BASH_SOURCE%/*}/create-env-from-local-cluster.sh --output ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
+${BASH_SOURCE%/*}/create-env-from-local-cluster.sh --base-oc-dir=${HOME}/openshift.local.clusterup --output ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 
 if [ -d "${HOME}/ods-configuration" ]; then 
     rm -rf ${HOME}/ods-configuration
@@ -62,4 +62,6 @@ CD_USER_TYPE=general \
 CD_USER_ID_B64=${CD_USER_ID_B64} \
 PIPELINE_TRIGGER_SECRET=${PIPELINE_TRIGGER_SECRET_B64} \
     ${BASH_SOURCE%/*}/../../create-projects/create-cd-jenkins.sh --ods-namespace ${NAMSPACE} --force --verbose
+
+oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:prov-cd:jenkins
 	
