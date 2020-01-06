@@ -62,7 +62,6 @@ HEAD=$(git rev-parse --abbrev-ref HEAD)
 if [ "${HEAD}" = "HEAD" ]; then
     HEAD="ci/cd"
     git checkout -b ${HEAD}
-    git commit -a -m "Mock Repo"
 fi
 git remote add mockbucket http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-core.git
 git -c http.sslVerify=false push mockbucket --set-upstream "${HEAD}:${REF}"
