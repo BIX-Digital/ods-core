@@ -36,7 +36,7 @@ matrix:
                 - oc cluster status
                 - oc login -u system:admin
                 - mkdir -p ods-config
-                - ./tests/recreate-test-infrastructure.sh                
+                - ./tests/scripts/recreate-test-infrastructure.sh
                 - cat ods-config/ods-core.env
                 - export GO111MODULE=on
             before_script:
