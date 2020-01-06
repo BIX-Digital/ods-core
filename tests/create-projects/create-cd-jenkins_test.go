@@ -62,16 +62,16 @@ func TestCreateJenkins(t *testing.T) {
 			stderr)
 	}
 
-	values,err := utils.ReadValues()
+	values, err := utils.ReadValues()
 	if err != nil {
 		t.Fatalf(
 			"Could not read ods-core.env")
 	}
-	
+
 	user := values["CD_USER_ID_B64"]
 	secret := values["PIPELINE_TRIGGER_SECRET_B64"]
 
-	stdout, stderr, err = utils.RunScriptFromBaseDir("create-projects/create-cd-jenkins.sh", []string{"--force", "--verbose",  "--ods-namespace", odsNamespace},
+	stdout, stderr, err = utils.RunScriptFromBaseDir("create-projects/create-cd-jenkins.sh", []string{"--force", "--verbose", "--ods-namespace", odsNamespace},
 		utils.PROJECT_ENV_VAR,
 		"CD_USER_TYPE=general",
 		fmt.Sprintf("CD_USER_ID_B64=%s", user),
@@ -85,9 +85,7 @@ func TestCreateJenkins(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..", "..", "create-projects", "ocp-config", "cd-jenkins")
 
-	_, _, _ = utils.RunCommand("oc", []string{"project", utils.PROJECT_NAME_CD})
-
-    stdout, stderr, err = utils.RunCommandWithWorkDir("tailor", []string{"status", "--force", "--reveal-secrets", "-n", utils.PROJECT_NAME_CD,
+	stdout, stderr, err = utils.RunCommandWithWorkDir("tailor", []string{"status", "--force", "--reveal-secrets", "-n", utils.PROJECT_NAME_CD,
 		fmt.Sprintf("--param=PROJECT=%s", utils.PROJECT_NAME),
 		fmt.Sprintf("--param=CD_USER_ID_B64=%s", user),
 		fmt.Sprintf("--param=NAMESPACE=%s", odsNamespace),
