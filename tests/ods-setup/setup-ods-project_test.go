@@ -6,7 +6,6 @@ import (
 	projectClientV1 "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"testing"
-	"time"
 )
 
 func TestCreateOdsProject(t *testing.T) {
@@ -42,18 +41,7 @@ func TestCreateOdsProject(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	gitReference := "production"
-
-	stdout, stderr, err = utils.RunScriptFromBaseDir("tests/scripts/deploy-mocks.sh", []string{
-		"--verbose",
-	})
-	if err != nil {
-		t.Fatalf(
-			"Execution of `deploy-mocks.sh` failed: \nStdOut: %s\nStdErr: %s",
-			stdout,
-			stderr)
-	}
-	time.Sleep(5 * time.Second)
+	gitReference := "ci/cd"
 
 	stdout, stderr, err = utils.RunScriptFromBaseDir("ods-setup/setup-jenkins-images.sh", []string{
 		"--verbose",
@@ -63,7 +51,7 @@ func TestCreateOdsProject(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf(
-			"Execution of `setup-mocked-ods-repo.sh` failed: \nStdOut: %s\nStdErr: %s",
+			"Execution of `setup-jenkins-images.sh` failed: \nStdOut: %s\nStdErr: %s",
 			stdout,
 			stderr)
 	}
