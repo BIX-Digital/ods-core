@@ -8,6 +8,9 @@ import (
 
 func RemoveProject(projectName string) error {
 	config, err := GetOCClient()
+	if err != nil {
+		return err
+	}
 	client, err := projectClientV1.NewForConfig(config)
 	if err != nil {
 		return err

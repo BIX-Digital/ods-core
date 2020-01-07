@@ -26,6 +26,6 @@ source ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 docker run -d -p "8080:8080" \
            --env="BASIC_USERNAME=${CD_USER_ID}" \
            --env="BASIC_PASSWORD=${CD_USER_PWD}" \
-           --env="REPOS=opendevstack/ods-core.git;opendevstack/ods-configuration.git" \
+           --env="REPOS=opendevstack/ods-core.git;opendevstack/ods-configuration.git;opendevstack/ods-quickstarters.git;opendevstack/ods-jenkins-shared-library.git" \
            --name mockbucket \
            hugowschneider/mockbucket:latest 

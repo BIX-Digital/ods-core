@@ -16,10 +16,18 @@ import (
 	"runtime"
 	"testing"
 	"time"
+	"io/ioutil"
 )
 
 func TestCreateProjectWithJenkinsFile(t *testing.T) {
-	_ = utils.RemoveAllTestOCProjects()
+	projectName := "testt"
+	projectNameCd :=  fmt.Sprintf("%s-cd", projectName)
+	projectNameTest :=  fmt.Sprintf("%s-test", projectName)
+	projectNameDev :=  fmt.Sprintf("%s-dev", projectName)
+	
+	_ = utils.RemoveProject(projectNameCd)
+	_ = utils.RemoveProject(projectNameTest)
+	_ = utils.RemoveProject(projectNameDev)
 
 	values, err := utils.ReadValues()
 	if err != nil {
@@ -28,12 +36,12 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 
 	request := utils.RequestBuild{
 		Repository: "ods-core",
-		Branch:     "ci/cd",
+		Branch:     "cicdtests",
 		Project:    "opendevstack",
 		Env: []utils.EnvPair{
 			{
 				Name:  "PROJECT_ID",
-				Value: utils.PROJECT_NAME,
+				Value: projectName,
 			},
 			{
 				Name:  "CD_USER_TYPE",
@@ -49,7 +57,11 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 			},
 			{
 				Name:  "ODS_GIT_REF",
-				Value: "ci/cd",
+				Value: "cicdtests",
+			},
+			{
+				Name:  "ODS_IMAGE_TAG",
+				Value: values["ODS_IMAGE_TAG"],
 			},
 		},
 	}
@@ -60,16 +72,24 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 	}
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	_, err = http.Post(
+	reponse, err := http.Post(
 		fmt.Sprintf("https://webhook-proxy-prov-cd.172.17.0.1.nip.io/build?trigger_secret=%s&jenkinsfile_path=create-projects/Jenkinsfile&component=ods-corejob-create-project-%s",
 			values["PIPELINE_TRIGGER_SECRET"],
-			utils.PROJECT_NAME),
+			projectName),
 		"application/json",
 		bytes.NewBuffer(body))
 
-	if err != nil {
+	if err != nil  {
 		t.Fatalf("Could not post request: %s", err)
 	}
+	
+	if reponse.StatusCode >= http.StatusAccepted {
+        bodyBytes, err := ioutil.ReadAll(reponse.Body)
+        if err != nil {
+            t.Fatal(err)
+        }
+        t.Fatalf("Could not post request: %s", string(bodyBytes))
+    }
 
 	config, err := utils.GetOCClient()
 	if err != nil {
@@ -80,12 +100,13 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error creating Build client: %s", err)
 	}
+
 	time.Sleep(10 * time.Second)
-	build, err := buildClient.Builds("prov-cd").Get(fmt.Sprintf("ods-corejob-create-project-%s-ci-cd-1", utils.PROJECT_NAME), metav1.GetOptions{})
+	build, err := buildClient.Builds("prov-cd").Get(fmt.Sprintf("ods-corejob-create-project-%s-cicdtests-1", projectName), metav1.GetOptions{})
 	count := 0
 	max := 240
 	for (err != nil || build.Status.Phase == v1.BuildPhaseNew || build.Status.Phase == v1.BuildPhasePending || build.Status.Phase == v1.BuildPhaseRunning) && count < max {
-		build, err = buildClient.Builds("prov-cd").Get(fmt.Sprintf("ods-corejob-create-project-%s-ci-cd-1", utils.PROJECT_NAME), metav1.GetOptions{})
+		build, err = buildClient.Builds("prov-cd").Get(fmt.Sprintf("ods-corejob-create-project-%s-cicdtests-1", projectName), metav1.GetOptions{})
 		time.Sleep(2 * time.Second)
 		if err != nil {
 			t.Log("Build is still not available")
@@ -95,10 +116,12 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 		count++
 	}
 
-	if count >= max || build.Status.Phase != v1.BuildPhaseComplete {
-		stdout, stderr, _ := utils.RunScriptFromBaseDir(
-			"tests/scripts/utils/print-jenkins-log.sh",
-			[]string{fmt.Sprintf("ods-corejob-create-project-%s-ci-cd-1", utils.PROJECT_NAME)})
+	stdout, stderr, _ := utils.RunScriptFromBaseDir(
+		"tests/scripts/utils/print-jenkins-log.sh",
+		[]string{fmt.Sprintf("ods-corejob-create-project-%s-cicdtests-1", projectName)})
+	
+		if count >= max || build.Status.Phase != v1.BuildPhaseComplete {
+		
 		if count >= max {
 			t.Fatalf(
 				"Timeout during build: \nStdOut: %s\nStdErr: %s",
@@ -121,57 +144,57 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 		t.Fatalf("Cannot list projects: %s", err)
 	}
 
-	if err = utils.FindProject(projects, utils.PROJECT_NAME_CD); err != nil {
-		t.Fatal(err)
+	if err = utils.FindProject(projects, projectNameCd); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
-	if err = utils.FindProject(projects, utils.PROJECT_NAME_TEST); err != nil {
-		t.Fatal(err)
+	if err = utils.FindProject(projects, projectNameTest); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
-	if err = utils.FindProject(projects, utils.PROJECT_NAME_DEV); err != nil {
-		t.Fatal(err)
+	if err = utils.FindProject(projects, projectNameDev); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
 	rbacV1Client, err := rbacv1client.NewForConfig(config)
 	if err != nil {
 		t.Fatalf("Cannot initialize RBAC Client: %s", err)
 	}
-	roleBindings, _ := rbacV1Client.RoleBindings(utils.PROJECT_NAME_CD).List(metav1.ListOptions{})
+	roleBindings, _ := rbacV1Client.RoleBindings(projectNameCd).List(metav1.ListOptions{})
 
-	if err = utils.FindRoleBinding(roleBindings, "jenkins", "ServiceAccount", utils.PROJECT_NAME_CD, "edit"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindRoleBinding(roleBindings, "jenkins", "ServiceAccount", projectNameCd, "edit"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
-	if err = utils.FindRoleBinding(roleBindings, "default", "ServiceAccount", utils.PROJECT_NAME_CD, "edit"); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = utils.FindRoleBinding(roleBindings, fmt.Sprintf("system:serviceaccounts:%s", utils.PROJECT_NAME_DEV), "Group", "", "system:image-puller"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindRoleBinding(roleBindings, "default", "ServiceAccount", projectNameCd, "edit"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
-	if err = utils.FindRoleBinding(roleBindings, fmt.Sprintf("system:serviceaccounts:%s", utils.PROJECT_NAME_TEST), "Group", "", "system:image-puller"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindRoleBinding(roleBindings, fmt.Sprintf("system:serviceaccounts:%s", projectNameDev), "Group", "", "system:image-puller"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
-	roleBindings, _ = rbacV1Client.RoleBindings(utils.PROJECT_NAME_DEV).List(metav1.ListOptions{})
-	if err = utils.FindRoleBinding(roleBindings, "default", "ServiceAccount", utils.PROJECT_NAME_DEV, "system:image-builder"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindRoleBinding(roleBindings, fmt.Sprintf("system:serviceaccounts:%s", projectNameTest), "Group", "", "system:image-puller"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
-	if err = utils.FindRoleBinding(roleBindings, fmt.Sprintf("system:serviceaccounts:%s", utils.PROJECT_NAME_TEST), "Group", "", "system:image-puller"); err != nil {
-		t.Fatal(err)
+	roleBindings, _ = rbacV1Client.RoleBindings(projectNameDev).List(metav1.ListOptions{})
+	if err = utils.FindRoleBinding(roleBindings, "default", "ServiceAccount", projectNameDev, "system:image-builder"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
-	if err = utils.FindRoleBinding(roleBindings, "jenkins", "ServiceAccount", utils.PROJECT_NAME_CD, "admin"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindRoleBinding(roleBindings, fmt.Sprintf("system:serviceaccounts:%s", projectNameTest), "Group", "", "system:image-puller"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
-	roleBindings, _ = rbacV1Client.RoleBindings(utils.PROJECT_NAME_TEST).List(metav1.ListOptions{})
-	if err = utils.FindRoleBinding(roleBindings, "default", "ServiceAccount", utils.PROJECT_NAME_TEST, "system:image-builder"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindRoleBinding(roleBindings, "jenkins", "ServiceAccount", projectNameCd, "admin"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
-	if err = utils.FindRoleBinding(roleBindings, "jenkins", "ServiceAccount", utils.PROJECT_NAME_CD, "admin"); err != nil {
-		t.Fatal(err)
+	roleBindings, _ = rbacV1Client.RoleBindings(projectNameTest).List(metav1.ListOptions{})
+	if err = utils.FindRoleBinding(roleBindings, "default", "ServiceAccount", projectNameTest, "system:image-builder"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
+	}
+
+	if err = utils.FindRoleBinding(roleBindings, "jenkins", "ServiceAccount", projectNameCd, "admin"); err != nil {
+		t.Fatalf("%s\n Jenkins logs: \nStdOut: %s\nStdErr: %s",err, stdout, stderr)
 	}
 
 	t.Log("WARNING: Seeding special and default permission groups is not tested yet!")
@@ -182,8 +205,8 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 	user := values["CD_USER_ID_B64"]
 	secret := values["PIPELINE_TRIGGER_SECRET_B64"]
 
-	stdout, stderr, err := utils.RunCommandWithWorkDir("tailor", []string{"status", "--force", "--reveal-secrets", "-n", utils.PROJECT_NAME_CD,
-		fmt.Sprintf("--param=PROJECT=%s", utils.PROJECT_NAME),
+	stdout, stderr, err = utils.RunCommandWithWorkDir("tailor", []string{"status", "--force", "--reveal-secrets", "-n", projectNameCd,
+		fmt.Sprintf("--param=PROJECT=%s", projectName),
 		fmt.Sprintf("--param=CD_USER_ID_B64=%s", user),
 		"--selector", "template=cd-jenkins-template",
 		fmt.Sprintf("--param=%s", fmt.Sprintf("PROXY_TRIGGER_SECRET_B64=%s", secret))}, dir)
