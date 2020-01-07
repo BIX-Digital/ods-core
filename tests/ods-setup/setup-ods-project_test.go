@@ -55,17 +55,6 @@ func TestCreateOdsProject(t *testing.T) {
 	}
 	time.Sleep(5 * time.Second)
 
-	stdout, stderr, err = utils.RunScriptFromBaseDir("tests/scripts/setup-mocked-ods-repo.sh", []string{
-		"--verbose",
-		"--ods-ref", gitReference,
-	})
-	if err != nil {
-		t.Fatalf(
-			"Execution of `setup-mocked-ods-repo.sh` failed: \nStdOut: %s\nStdErr: %s",
-			stdout,
-			stderr)
-	}
-
 	stdout, stderr, err = utils.RunScriptFromBaseDir("ods-setup/setup-jenkins-images.sh", []string{
 		"--verbose",
 		"--force",
