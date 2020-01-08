@@ -9,8 +9,7 @@ if [ ${URL} != "https://127.0.0.1:8443" ]; then
 fi
 
 if ! oc get clusterroles | grep request_role; then
-echo "{ \"apiVersion\": \"v1\", \"kind\": \"ClusterRole\", \"metadata\": { \"name\": \"request_role\" }, \"rules\": [ { \"verbs\": [\"create\"], \"resources\": [\"projectrequests\"] }, { \"verbs\": [\"get\",\"list\",\"watch\"], \"resources\": [\"*\"] } ] }" \
-    | oc create -f -
+  oc create -f ${BASH_SOURCE%/*}/json/create-cluster-role.json
 fi
 
 if [ ! -d ${BASH_SOURCE%/*}/../../ods-config ]; then
@@ -19,7 +18,7 @@ fi
 
 ${BASH_SOURCE%/*}/create-env-from-local-cluster.sh --base-oc-dir=${HOME}/openshift.local.clusterup --output ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 
-if [ -d "${HOME}/ods-configuration" ]; then 
+if [ -d "${HOME}/ods-configuration" ]; then
     rm -rf ${HOME}/ods-configuration
 fi
 
@@ -36,8 +35,7 @@ fi
 
 ${BASH_SOURCE%/*}/../../ods-setup/setup-ods-project.sh --verbose --force --namespace ${NAMSPACE}
 
-${BASH_SOURCE%/*}/deploy-mocks.sh  --verbose
-sleep 10 # Waiting for service to boot up
+${BASH_SOURCE%/*}/deploy-mocks.sh  --verbose --wait
 ${BASH_SOURCE%/*}/setup-mocked-ods-repo.sh --ods-ref ${REF} --verbose
 
 ${BASH_SOURCE%/*}/../../ods-setup/setup-jenkins-images.sh --namespace ${NAMSPACE} --force --verbose --ods-ref ${REF}
@@ -64,4 +62,3 @@ PIPELINE_TRIGGER_SECRET=${PIPELINE_TRIGGER_SECRET_B64} \
     ${BASH_SOURCE%/*}/../../create-projects/create-cd-jenkins.sh --ods-namespace ${NAMSPACE} --force --verbose
 
 oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:prov-cd:jenkins
-	

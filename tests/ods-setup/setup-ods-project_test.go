@@ -16,7 +16,7 @@ func TestCreateOdsProject(t *testing.T) {
 		"--verbose",
 		"--namespace",
 		namespace,
-	})
+	}, []string{})
 	if err != nil {
 		t.Fatalf(
 			"Execution of `setup-ods-project.sh` failed: \nStdOut: %s\nStdErr: %s",
@@ -48,7 +48,7 @@ func TestCreateOdsProject(t *testing.T) {
 		"--force",
 		"--ods-ref", gitReference,
 		"--namespace", namespace,
-	})
+	}, []string{})
 	if err != nil {
 		t.Fatalf(
 			"Execution of `setup-jenkins-images.sh` failed: \nStdOut: %s\nStdErr: %s",

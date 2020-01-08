@@ -100,8 +100,8 @@ func CheckProjectSetup(t *testing.T) {
 			Namespace:   "",
 			RoleName:    "system:image-puller",
 		}, {
-			SubjectName: "ServiceAccount",
-			SubjectType: "Group",
+			SubjectName: "jenkins",
+			SubjectType: "ServiceAccount",
 			Namespace:   utils.PROJECT_NAME_CD,
 			RoleName:    "admin",
 		},
@@ -119,8 +119,8 @@ func CheckProjectSetup(t *testing.T) {
 			Namespace:   utils.PROJECT_NAME_TEST,
 			RoleName:    "system:image-builder",
 		}, {
-			SubjectName: "ServiceAccount",
-			SubjectType: "Group",
+			SubjectName: "jenkins",
+			SubjectType: "ServiceAccount",
 			Namespace:   utils.PROJECT_NAME_CD,
 			RoleName:    "admin",
 		},

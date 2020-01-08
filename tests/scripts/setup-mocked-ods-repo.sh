@@ -11,7 +11,7 @@ function usage {
 
 urlencode() {
     # urlencode <string>
-    
+
     local length="${#1}"
     for (( i = 0; i < length; i++ )); do
         local c="${1:i:1}"
@@ -20,13 +20,11 @@ urlencode() {
             *) printf '%%%02X' "'$c" ;;
         esac
     done
-    
-   
+
+
 }
 
 REF=""
-NAMESPACE=""
-
 
 URL=$(oc config view --minify -o jsonpath='{.clusters[*].cluster.server}')
 if [ ${URL} != "https://127.0.0.1:8443" ]; then
@@ -36,7 +34,7 @@ fi
 while [[ "$#" -gt 0 ]]; do case $1 in
 
    -v|--verbose) set -x;;
-   
+
    -h|--help) usage; exit 0;;
 
    -b=*|--ods-ref=*) REF="${1#*=}";;
@@ -50,10 +48,10 @@ if git remote -v | grep mockbucket; then
 fi
 
 
-if [ -z "${REF}" ]; then 
+if [ -z "${REF}" ]; then
     echo "Reference --ods-ref must be provided"
     exit 1
-fi 
+fi
 
 source ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 
@@ -63,14 +61,16 @@ if [ "${HEAD}" = "HEAD" ]; then
     HEAD="cicdtests"
     git checkout -b ${HEAD}
 fi
-git remote add mockbucket http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-core.git
+git remote add mockbucket "http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-core.git"
 git -c http.sslVerify=false push mockbucket --set-upstream "${HEAD}:${REF}"
 git remote remove mockbucket
 
 mkdir -p "${HOME}/ods-configuration"
-git -C "${HOME}/ods-configuration" init
+cd "${HOME}/ods-configuration"
+git  init
 cp ${BASH_SOURCE%/*}/../../ods-config/ods-core.env ${HOME}/ods-configuration
-git -C "${HOME}/ods-configuration" add ods-core.env
-git -C "${HOME}/ods-configuration" commit -m "Initial Commit"
-git -C "${HOME}/ods-configuration" remote add mockbucket http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-configuration.git
-git -C "${HOME}/ods-configuration" -c http.sslVerify=false push mockbucket --set-upstream "$(git -C "${HOME}/ods-configuration" rev-parse --abbrev-ref HEAD):${REF}"
+git add ods-core.env
+git commit -m "Initial Commit"
+git remote add mockbucket "http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-configuration.git"
+git -c http.sslVerify=false push mockbucket --set-upstream "$(git rev-parse --abbrev-ref HEAD):${REF}"
+cd -

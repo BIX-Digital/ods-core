@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-set -xe
+set -ue
 
 function usage {
-   printf "usage: %s [options]\n", $0
+   printf "usage: %s [options]\n" $0
    printf "\t--force\tIgnores warnings and error with tailor --force\n"
    printf "\t-h|--help\tPrints the usage\n"
    printf "\t-v|--verbose\tVerbose output\n"
    printf "\t-t|--tailor\tChanges the executable of tailor. Default: tailor\n"
-   printf "\t-n|--namespace\tChanges the default namespace. Default: cd\n"
+   printf "\t-n|--namespace\tChanges the default OpenDevStack namespace where all resources will be created. Default: cd\n"
 
 }
 TAILOR="tailor"

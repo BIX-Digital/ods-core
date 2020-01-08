@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 #!/usr/bin/env bash
-set -xe
+set -ue
 
 function usage {
-   printf "usage: %s [options]\n", $0
+   printf "usage: %s [options]\n" $0
    printf "\t--force\tIgnores warnings and error with tailor --force\n"
    printf "\t-h|--help\tPrints the usage\n"
    printf "\t-v|--verbose\tVerbose output\n"
    printf "\t-t|--tailor\tChanges the executable of tailor. Default: tailor\n"
-   printf "\t-n|--namespace\tChanges the default namespace. Default: cd\n"
+   printf "\t-n|--namespace\tChanges the default OpenDevStack namespace where all resources will be created. Default: cd\n"
    printf "\t-r|--ods-base-repository\tODS base repository. Overrides default in settings file\n"
    printf "\t-b|--ods-ref\tODS reference in repository. Overrides default in settings file\n"
 
@@ -42,12 +42,12 @@ while [[ "$#" -gt 0 ]]; do case $1 in
  esac; shift; done
 
 if ! oc whoami; then
-  echo "You should be logged to run the script"
+  echo "You should be logged into OpenShift to run the script"
   exit 1
 fi
 
 if ! oc project ${NAMESPACE}; then
-  echo "The project '${NAMESPACE}' does not exists. Please setup the project using 'setup-ods-project.sh'"
+  echo "The project '${NAMESPACE}' does not exist. Please setup the project using 'setup-ods-project.sh'"
   exit 1
 fi
 
