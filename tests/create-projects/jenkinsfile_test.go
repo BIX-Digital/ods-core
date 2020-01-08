@@ -9,6 +9,7 @@ import (
 	v1 "github.com/openshift/api/build/v1"
 	buildClientV1 "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
 	projectClientV1 "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
+	"io/ioutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 	"time"
 )
 
-func TestCreateProjectWithJenkinsFile(t *testing.T) {
+func TestJenkinsFile(t *testing.T) {
 	_ = utils.RemoveAllTestOCProjects()
 
 	values, err := utils.ReadValues()
@@ -60,7 +61,7 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 	}
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	_, err = http.Post(
+	reponse, err := http.Post(
 		fmt.Sprintf("https://webhook-proxy-prov-cd.172.17.0.1.nip.io/build?trigger_secret=%s&jenkinsfile_path=create-projects/Jenkinsfile&component=ods-corejob-create-project-%s",
 			values["PIPELINE_TRIGGER_SECRET"],
 			utils.PROJECT_NAME),
@@ -69,6 +70,14 @@ func TestCreateProjectWithJenkinsFile(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("Could not post request: %s", err)
+	}
+
+	if reponse.StatusCode >= http.StatusAccepted {
+		bodyBytes, err := ioutil.ReadAll(reponse.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Fatalf("Could not post request: %s", string(bodyBytes))
 	}
 
 	config, err := utils.GetOCClient()
