@@ -53,7 +53,7 @@ func TestCreateJenkinsWithOutSecret(t *testing.T) {
 
 func TestCreateJenkins(t *testing.T) {
 	_ = utils.RemoveAllTestOCProjects()
-	odsNamespace := "ods"
+	odsNamespace := "cd"
 	stdout, stderr, err := utils.RunScriptFromBaseDir("create-projects/create-projects.sh", []string{}, utils.PROJECT_ENV_VAR)
 	if err != nil {
 		t.Fatalf(

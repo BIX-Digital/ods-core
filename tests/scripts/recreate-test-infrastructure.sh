@@ -24,7 +24,7 @@ if [ -d "${HOME}/ods-configuration" ]; then
 fi
 
 NAMSPACE="cd"
-REF="ci/cd"
+REF="cicdtests"
 
 if ! oc whoami; then
     echo "You must be logged in to the OC Cluster"

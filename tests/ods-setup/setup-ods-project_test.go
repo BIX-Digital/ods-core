@@ -41,7 +41,7 @@ func TestCreateOdsProject(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	gitReference := "ci/cd"
+	gitReference := "cicdtests"
 
 	stdout, stderr, err = utils.RunScriptFromBaseDir("ods-setup/setup-jenkins-images.sh", []string{
 		"--verbose",
@@ -62,28 +62,15 @@ func TestCreateOdsProject(t *testing.T) {
 	}
 
 	images, err := imageClient.ImageStreams(namespace).List(metav1.ListOptions{})
-	if err = utils.FindImageTag(images, "jenkins-master", "test"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindImageTag(images, "jenkins-master", gitReference); err != nil {
+		t.Fatalf("%s\nScript:\nStdOut: %s\nStdErr: %s", err, stdout, stderr)
 	}
 
-	if err = utils.FindImageTag(images, "jenkins-slave-base", "test"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindImageTag(images, "jenkins-slave-base", gitReference); err != nil {
+		t.Fatalf("%s\nScript:\nStdOut: %s\nStdErr: %s", err, stdout, stderr)
 	}
 
-	if err = utils.FindImageTag(images, "jenkins-webhook-proxy", "test"); err != nil {
-		t.Fatal(err)
+	if err = utils.FindImageTag(images, "jenkins-webhook-proxy", gitReference); err != nil {
+		t.Fatalf("%s\nScript:\nStdOut: %s\nStdErr: %s", err, stdout, stderr)
 	}
-
-	if err = utils.FindImageTag(images, "jenkins-master", "latest"); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = utils.FindImageTag(images, "jenkins-slave-base", "latest"); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = utils.FindImageTag(images, "jenkins-webhook-proxy", "latest"); err != nil {
-		t.Fatal(err)
-	}
-
 }

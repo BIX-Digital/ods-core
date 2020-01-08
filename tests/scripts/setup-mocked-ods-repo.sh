@@ -60,7 +60,7 @@ source ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 # git checkout -b "${REF}"
 HEAD=$(git rev-parse --abbrev-ref HEAD)
 if [ "${HEAD}" = "HEAD" ]; then
-    HEAD="ci/cd"
+    HEAD="cicdtests"
     git checkout -b ${HEAD}
 fi
 git remote add mockbucket http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-core.git

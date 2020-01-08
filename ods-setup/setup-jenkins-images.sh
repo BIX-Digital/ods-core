@@ -67,7 +67,3 @@ echo "Start Jenkins Builds"
 oc start-build -n ${NAMESPACE} jenkins-master --follow
 oc start-build -n ${NAMESPACE} jenkins-slave-base --follow
 oc start-build -n ${NAMESPACE} jenkins-webhook-proxy --follow
-
-oc tag ${NAMESPACE}/jenkins-master:test ${NAMESPACE}/jenkins-master:latest
-oc tag ${NAMESPACE}/jenkins-slave-base:test ${NAMESPACE}/jenkins-slave-base:latest
-oc tag ${NAMESPACE}/jenkins-webhook-proxy:test ${NAMESPACE}/jenkins-webhook-proxy:latest
