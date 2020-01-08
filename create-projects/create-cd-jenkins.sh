@@ -17,6 +17,7 @@ function usage {
    printf "\t-h|--help\tPrints the usage\n"
    printf "\t-v|--verbose\tVerbose output\n"
    printf "\t-t|--tailor\tChanges the executable of tailor. Default: tailor\n"
+   printf "\tods-namespace\tThe namespace where all ODS resources reside. Default: cd\n"
 
 }
 

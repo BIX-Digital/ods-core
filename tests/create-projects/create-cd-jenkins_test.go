@@ -3,14 +3,12 @@ package create_projects
 import (
 	"fmt"
 	"github.com/opendevstack/ods-core/tests/utils"
-	"path"
-	"runtime"
 	"testing"
 )
 
 func TestCreateJenkinsWithMissingEnvVars(t *testing.T) {
 
-	values, err := utils.ReadValues()
+	values, err := utils.ReadConfiguration()
 	if err != nil {
 		t.Fatalf(
 			"Could not read ods-core.env")
@@ -68,7 +66,10 @@ func TestCreateJenkinsWithMissingEnvVars(t *testing.T) {
 }
 
 func TestCreateJenkinsSuccessfully(t *testing.T) {
-	_ = utils.RemoveAllTestOCProjects()
+	err := utils.RemoveAllTestOCProjects()
+	if err != nil {
+		t.Fatal("Unable to remove test projects")
+	}
 	odsNamespace := "cd"
 	stdout, stderr, err := utils.RunScriptFromBaseDir("create-projects/create-projects.sh", []string{}, []string{utils.PROJECT_ENV_VAR})
 	if err != nil {
@@ -78,7 +79,7 @@ func TestCreateJenkinsSuccessfully(t *testing.T) {
 			stderr)
 	}
 
-	values, err := utils.ReadValues()
+	values, err := utils.ReadConfiguration()
 	if err != nil {
 		t.Fatalf(
 			"Could not read ods-core.env")
@@ -101,23 +102,5 @@ func TestCreateJenkinsSuccessfully(t *testing.T) {
 			stdout,
 			stderr)
 	}
-	_, filename, _, _ := runtime.Caller(0)
-	dir := path.Join(path.Dir(filename), "..", "..", "create-projects", "ocp-config", "cd-jenkins")
-
-	stdout, stderr, err = utils.RunCommandWithWorkDir("tailor", []string{
-		"status",
-		"--force",
-		"--reveal-secrets",
-		"-n", utils.PROJECT_NAME_CD,
-		fmt.Sprintf("--param=PROJECT=%s", utils.PROJECT_NAME),
-		fmt.Sprintf("--param=CD_USER_ID_B64=%s", user),
-		fmt.Sprintf("--param=NAMESPACE=%s", odsNamespace),
-		"--selector", "template=cd-jenkins-template",
-		fmt.Sprintf("--param=%s", fmt.Sprintf("PROXY_TRIGGER_SECRET_B64=%s", secret))}, dir, []string{})
-	if err != nil {
-		t.Fatalf(
-			"Execution of tailor failed: \nStdOut: %s\nStdErr: %s",
-			stdout,
-			stderr)
-	}
+	CheckJenkinsWithTailor(values, utils.PROJECT_NAME_CD, utils.PROJECT_NAME, t)
 }

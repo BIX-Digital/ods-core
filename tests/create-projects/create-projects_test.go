@@ -20,7 +20,11 @@ func TestCreateProjectWithoutProjectId(t *testing.T) {
 }
 
 func TestCreateProject(t *testing.T) {
-	_ = utils.RemoveAllTestOCProjects()
+	err := utils.RemoveAllTestOCProjects()
+	if err != nil {
+		t.Fatal("Unable to remove test projects")
+	}
+
 	stdout, stderr, err := utils.RunScriptFromBaseDir("create-projects/create-projects.sh", []string{}, []string{utils.PROJECT_ENV_VAR})
 	if err != nil {
 		t.Fatalf(
