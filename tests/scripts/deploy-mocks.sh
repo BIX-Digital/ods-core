@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
+set -eu
 
-NAMESPACE=mocks
 
-RECREATE="false"
+function usage {
+   printf "usage: %s [options]\n", $0
+   printf "\t-h|--help\tPrints the usage\n"
+   printf "\t-v|--verbose\tVerbose output\n"
+   printf "\t-w|--wait\tWaits for the service(s). Depends on netcat \n"
+
+}
+WAIT=false
 while [[ "$#" -gt 0 ]]; do case $1 in
 
    -v|--verbose) set -x;;
 
    -h|--help) usage; exit 0;;
+
+   -w|--wait) WAIT=true;;
 
    *) echo "Unknown parameter passed: $1"; usage; exit 1;;
  esac; shift; done
@@ -21,11 +30,20 @@ if docker ps -a --format "{{.Names}}" | grep mockbucket; then
     docker rm mockbucket --force
 fi
 
-
 source ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 docker run -d -p "8080:8080" \
            --env="BASIC_USERNAME=${CD_USER_ID}" \
            --env="BASIC_PASSWORD=${CD_USER_PWD}" \
            --env="REPOS=opendevstack/ods-core.git;opendevstack/ods-configuration.git;opendevstack/ods-quickstarters.git;opendevstack/ods-jenkins-shared-library.git" \
            --name mockbucket \
-           hugowschneider/mockbucket:latest 
+           hugowschneider/mockbucket:latest
+
+if [ ${WAIT} == "true" ]; then
+  echo "Waiting for mockbucket to launch on 8080..."
+
+  while ! nc -z localhost 8080; do
+    sleep 1 # wait for 1/10 of the second before check again
+  done
+
+  echo "Mockbucket is running"
+fi
