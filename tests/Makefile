@@ -7,7 +7,7 @@ test: create-projects/create-projects_test.go create-projects/create-projects_te
 	sleep 5
 	go test -v github.com/opendevstack/ods-core/tests/create-projects -run "^(TestJenkinsFile)"
 	sleep 5
-	go test -v github.com/opendevstack/ods-core/tests/ods-setup -run ^(TestJenkinsFile)
+	go test -v github.com/opendevstack/ods-core/tests/ods-setup -run "^(TestJenkinsFile)"
 
 lint:
 	echo "Checking code ..."
