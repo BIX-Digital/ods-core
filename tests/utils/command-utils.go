@@ -9,13 +9,13 @@ import (
 	"runtime"
 )
 
-func RunScriptFromBaseDir(command string, args []string, envVars ...string) (string, string, error) {
+func RunScriptFromBaseDir(command string, args []string, envVars []string) (string, string, error) {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..", "..")
-	return RunCommand("bash", append([]string{fmt.Sprintf("%s/%s", dir, command)}, args...), envVars...)
+	return RunCommand(fmt.Sprintf("%s/%s", dir, command), args, envVars)
 }
 
-func RunCommand(command string, args []string, envVars ...string) (string, string, error) {
+func RunCommand(command string, args []string, envVars []string) (string, string, error) {
 	cmd := exec.Command(command, args...)
 	cmd.Env = append(os.Environ(), envVars...)
 	var stdout, stderr bytes.Buffer
@@ -25,7 +25,7 @@ func RunCommand(command string, args []string, envVars ...string) (string, strin
 	return string(stdout.Bytes()), string(stderr.Bytes()), err
 }
 
-func RunCommandWithWorkDir(command string, args []string, workDir string, envVars ...string) (string, string, error) {
+func RunCommandWithWorkDir(command string, args []string, workDir string, envVars []string) (string, string, error) {
 	cmd := exec.Command(command, args...)
 	cmd.Env = append(os.Environ(), envVars...)
 	cmd.Dir = workDir

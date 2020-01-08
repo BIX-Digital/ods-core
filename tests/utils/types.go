@@ -11,3 +11,9 @@ type RequestBuild struct {
 	Env        []EnvPair `json:"env"`
 	Project    string    `json:"project"`
 }
+type RoleBinding struct {
+	SubjectName string
+	SubjectType string
+	Namespace   string
+	RoleName    string
+}
