@@ -44,4 +44,4 @@ matrix:
             before_script:
                 - cd tests
             script:
-                - make test || df -h; oc get pods --all-namespaces -o wide; docker ps; ls /asdkjhda/asdasd
+                - make test

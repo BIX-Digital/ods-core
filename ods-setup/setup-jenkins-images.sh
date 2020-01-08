@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
+#Builds all jenkins-master jenkins-slave-base and webhook-proxy
+
 set -ue
 
 function usage {

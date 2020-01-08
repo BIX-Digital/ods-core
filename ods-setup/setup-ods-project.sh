@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# Create the namespace for holding all ODS resources
+
 set -ue
 
 function usage {

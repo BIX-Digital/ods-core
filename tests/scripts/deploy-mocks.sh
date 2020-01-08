@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -eu
+# (Re)deploys the mocked services for ODS using docker
 
+set -eu
 
 function usage {
    printf "usage: %s [options]\n", $0

@@ -21,9 +21,12 @@ func TestJenkinsFile(t *testing.T) {
 	projectName := utils.PROJECT_NAME
 	projectNameCd := utils.PROJECT_NAME_CD
 
-	_ = utils.RemoveAllTestOCProjects()
+	err := utils.RemoveAllTestOCProjects()
+	if err != nil {
+		t.Fatal("Unable to remove test projects")
+	}
 
-	values, err := utils.ReadValues()
+	values, err := utils.ReadConfiguration()
 	if err != nil {
 		t.Fatalf("Error reading ods-core.env: %s", err)
 	}
@@ -140,14 +143,18 @@ func TestJenkinsFile(t *testing.T) {
 
 	}
 	CheckProjectSetup(t)
+	CheckJenkinsWithTailor(values, projectNameCd, projectName, t)
 
+}
+
+func CheckJenkinsWithTailor(values map[string]string, projectNameCd string, projectName string, t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..", "..", "create-projects", "ocp-config", "cd-jenkins")
 
 	user := values["CD_USER_ID_B64"]
 	secret := values["PIPELINE_TRIGGER_SECRET_B64"]
 
-	stdout, stderr, err = utils.RunCommandWithWorkDir("tailor", []string{"status", "--force", "--reveal-secrets", "-n", projectNameCd,
+	stdout, stderr, err := utils.RunCommandWithWorkDir("tailor", []string{"status", "--force", "--reveal-secrets", "-n", projectNameCd,
 		fmt.Sprintf("--param=PROJECT=%s", projectName),
 		fmt.Sprintf("--param=CD_USER_ID_B64=%s", user),
 		"--selector", "template=cd-jenkins-template",
@@ -159,5 +166,4 @@ func TestJenkinsFile(t *testing.T) {
 			stdout,
 			stderr)
 	}
-
 }

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func ReadValues() (map[string]string, error) {
+func ReadConfiguration() (map[string]string, error) {
 
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..", "..", "ods-config", "ods-core.env")
