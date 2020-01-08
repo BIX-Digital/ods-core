@@ -66,9 +66,10 @@ git -c http.sslVerify=false push mockbucket --set-upstream "${HEAD}:${REF}"
 git remote remove mockbucket
 
 mkdir -p "${HOME}/ods-configuration"
-cd "${HOME}/ods-configuration"
-git  init
 cp ${BASH_SOURCE%/*}/../../ods-config/ods-core.env ${HOME}/ods-configuration
+
+cd "${HOME}/ods-configuration"
+git init
 git add ods-core.env
 git commit -m "Initial Commit"
 git remote add mockbucket "http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-configuration.git"
