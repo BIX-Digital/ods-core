@@ -44,4 +44,4 @@ matrix:
             before_script:
                 - cd tests
             script:
-                - env GO111MODULE=on make test
+                - env GO111MODULE=on make test || oc get pods --all-namespaces -o wide; docker ps; ls /asdkjhda/asdasd
