@@ -16,9 +16,6 @@ jobs:
         with:
           fetch-depth: 0
       - 
-        name: Install dependecies
-        run: sudo apt install jq
-      - 
         name: Setup Go for use with actions
         uses: actions/setup-go@v1.0.0
         with:      
@@ -37,7 +34,7 @@ jobs:
          run: oc version
       -
          name: 'jq version'
-         run: jq version
+         run: jq --version
       -
          name: 'Docker version'
          run: docker --version && cat /etc/docker/daemon.json && sudo service docker status
