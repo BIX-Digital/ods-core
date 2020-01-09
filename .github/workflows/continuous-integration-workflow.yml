@@ -59,7 +59,7 @@ jobs:
          name: Create test infrastructure
          run: mkdir -p ods-config && ./tests/scripts/recreate-test-infrastructure.sh
          working-directory: $GITHUB_WORKSPACE
-     -
+      -
          name: Run tests
          run: make -C tests test
          working-directory: $GITHUB_WORKSPACE
