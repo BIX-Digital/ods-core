@@ -1,0 +1,16 @@
+name: Continous Integration Tests
+on:
+    push:
+        branches:
+            - master
+        pull_request:
+            branches:
+                - master
+jobs:
+    test:
+        runs-on: ubuntu-16.04
+        steps:
+            - name: Testing actions
+              run: echo 123
+            - name: Testing actions
+              run: echo 456
