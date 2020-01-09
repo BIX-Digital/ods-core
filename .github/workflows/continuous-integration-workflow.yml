@@ -16,6 +16,9 @@ jobs:
         with:
           fetch-depth: 0
       - 
+        name: Install dependecies
+        run: sudo apt install jq
+      - 
         name: Setup Go for use with actions
         uses: actions/setup-go@v1.0.0
         with:      
