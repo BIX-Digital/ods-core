@@ -56,6 +56,8 @@ fi
 
 source ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 
+docker ps | grep mockbucket
+
 # git checkout -b "${REF}"
 HEAD=$(git rev-parse --abbrev-ref HEAD)
 if [ "${HEAD}" = "HEAD" ]; then

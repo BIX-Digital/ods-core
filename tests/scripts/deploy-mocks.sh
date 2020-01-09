@@ -42,8 +42,14 @@ docker run -d -p "8080:8080" \
 if [ ${WAIT} == "true" ]; then
   echo "Waiting for mockbucket to launch on 8080..."
 
-  while ! nc -z localhost 8080; do
-    sleep 1 # wait for 1/10 of the second before check again
+  while ! nc -z 172.17.0.1 8080; do
+    echo "Port 8080 is not responding..."
+    sleep 1 
+  done
+
+  while [ "$(curl http://172.17.0.1:8080 -u $CD_USER_ID:$CD_USER_PWD -o /dev/null -w '%{http_code}' -s)" != "200" ]; do 
+    echo "Service is still not running..."
+    sleep 1 
   done
 
   echo "Mockbucket is running"
