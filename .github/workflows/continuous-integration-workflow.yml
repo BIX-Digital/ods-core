@@ -12,7 +12,9 @@ jobs:
     steps:
       - 
         name: GitHub context
-        run: jq . <<< ${{ toJson(github) }}
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }
+        run: jq . <<< "${GITHUB_CONTEXT}"
       - 
         name: Checkout repository
         uses: actions/checkout@v2.0.0
