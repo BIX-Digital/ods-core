@@ -71,6 +71,8 @@ cp ${BASH_SOURCE%/*}/../../ods-config/ods-core.env ${BASH_SOURCE%/*}/../../../od
 
 cd "${BASH_SOURCE%/*}/../../../ods-configuration"
 git init
+git config user.email "test@suite.nip.io"
+git config user.name "Test Suite"
 git add ods-core.env
 git commit -m "Initial Commit"
 git remote add mockbucket "http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_USER_PWD})@${BITBUCKET_HOST}/scm/opendevstack/ods-configuration.git"
