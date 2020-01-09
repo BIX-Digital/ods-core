@@ -4,8 +4,9 @@ set -uxe
 
 URL=$(oc config view --minify -o jsonpath='{.clusters[*].cluster.server}')
 
-if [ ${URL} != "https://127.0.0.1:8443" ]; then
+if [ ${URL} != "https://172.17.0.1:8443" ]; then
     echo "You are not in a local cluster. Stopping now!!!"
+    exit 1
 fi
 
 if ! oc get clusterroles | grep request_role; then
@@ -18,8 +19,8 @@ fi
 
 ${BASH_SOURCE%/*}/create-env-from-local-cluster.sh --base-oc-dir=${HOME}/openshift.local.clusterup --output ${BASH_SOURCE%/*}/../../ods-config/ods-core.env
 
-if [ -d "${HOME}/ods-configuration" ]; then
-    rm -rf ${HOME}/ods-configuration
+if [ -d "${BASH_SOURCE%/*}/../../../ods-configuration" ]; then
+    rm -rf "${BASH_SOURCE%/*}/../../../ods-configuration"
 fi
 
 NAMSPACE="cd"
@@ -33,10 +34,10 @@ if oc project ${NAMSPACE}; then
     oc delete project ${NAMSPACE}
 fi
 
-${BASH_SOURCE%/*}/../../ods-setup/setup-ods-project.sh --verbose --force --namespace ${NAMSPACE}
-
 ${BASH_SOURCE%/*}/deploy-mocks.sh  --verbose --wait
 ${BASH_SOURCE%/*}/setup-mocked-ods-repo.sh --ods-ref ${REF} --verbose
+
+${BASH_SOURCE%/*}/../../ods-setup/setup-ods-project.sh --verbose --force --namespace ${NAMSPACE}
 
 ${BASH_SOURCE%/*}/../../ods-setup/setup-jenkins-images.sh --namespace ${NAMSPACE} --force --verbose --ods-ref ${REF}
 

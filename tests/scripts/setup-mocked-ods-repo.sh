@@ -27,8 +27,9 @@ urlencode() {
 REF=""
 
 URL=$(oc config view --minify -o jsonpath='{.clusters[*].cluster.server}')
-if [ ${URL} != "https://127.0.0.1:8443" ]; then
+if [ ${URL} != "https://172.17.0.1:8443" ]; then
     echo "You are not in a local cluster. Stopping now!!!"
+    exit 1
 fi
 
 while [[ "$#" -gt 0 ]]; do case $1 in
@@ -65,10 +66,10 @@ git remote add mockbucket "http://$(urlencode ${CD_USER_ID}):$(urlencode ${CD_US
 git -c http.sslVerify=false push mockbucket --set-upstream "${HEAD}:${REF}"
 git remote remove mockbucket
 
-mkdir -p "${HOME}/ods-configuration"
-cp ${BASH_SOURCE%/*}/../../ods-config/ods-core.env ${HOME}/ods-configuration
+mkdir -p "${BASH_SOURCE%/*}/../../../ods-configuration"
+cp ${BASH_SOURCE%/*}/../../ods-config/ods-core.env ${BASH_SOURCE%/*}/../../../ods-configuration
 
-cd "${HOME}/ods-configuration"
+cd "${BASH_SOURCE%/*}/../../../ods-configuration"
 git init
 git add ods-core.env
 git commit -m "Initial Commit"
