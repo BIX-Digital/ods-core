@@ -1,13 +1,11 @@
 name: Continous Integration Tests
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
 jobs:
   test:
+    name: ODS resources setup and provisioning tests
     runs-on: ubuntu-16.04
     steps:
       - 
