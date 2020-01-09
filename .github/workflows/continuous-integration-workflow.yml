@@ -1,4 +1,4 @@
-name: 'Continous Integration Tests'
+name: Continous Integration Tests
 on:
   push:
     branches:
@@ -71,4 +71,3 @@ jobs:
          name: Run tests
          run: make -C tests test
          working-directory: ${{  env.GITHUB_WORKSPACE }}
-         

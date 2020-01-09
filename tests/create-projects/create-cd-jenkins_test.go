@@ -10,7 +10,7 @@ func TestCreateJenkinsWithMissingEnvVars(t *testing.T) {
 
 	values, err := utils.ReadConfiguration()
 	if err != nil {
-		t.Fatalf(
+		t.Fatal(
 			"Could not read ods-core.env")
 	}
 
