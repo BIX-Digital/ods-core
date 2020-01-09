@@ -1,15 +1,11 @@
 apiVersion: v1
 kind: Template
 metadata:
-  annotations: {}
-  creationTimestamp: null
   name: nexus3
 objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    annotations: {}
-    creationTimestamp: null
     labels:
       app: nexus3
     name: nexus3
@@ -27,4 +23,5 @@ objects:
     wildcardPolicy: None
 parameters:
 - name: NEXUS_HOST
+  description: Nexus host without protocol - which is attached based on the configuration in the route.yml
   required: true

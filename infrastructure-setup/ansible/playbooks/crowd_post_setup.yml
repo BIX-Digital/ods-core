@@ -1,10 +1,10 @@
 # After initial configuration of Crowd, it is not directly possible to
-# login because auf restrictions.
+# login because of restrictions.
 # Logins are only allowed from specific remote addresses.
 # We will insert the required remote addresses of our AWS load balancers
 # to the database relations
 ---
-- hosts: "{{ target_hosts | default('tag_hostgroup_crowd_test') }}"
+- hosts: "{{ target_hosts | default('tag_hostgroup_crowd_dev') }}"
   tasks:
   - name: "allow connections from load balancers"
     delegate_to: 127.0.0.1
