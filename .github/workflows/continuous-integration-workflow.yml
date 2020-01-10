@@ -51,6 +51,9 @@ jobs:
          name: Docker version
          run: docker --version
       -
+         name: Network before changes
+         run: ifconfig
+      -
          name: Configure docker network and insecure registries
          run: "sudo cat /etc/docker/daemon.json | jq '. + {\"bip\": \"172.17.0.1/16\", \"default-address-pools\": [{\"base\":\"172.17.0.0/16\",\"size\":16}], \"insecure-registries\": [\"172.30.0.0/16\"]}' | sudo tee /etc/docker/daemon.json && sudo service docker restart"
       -
