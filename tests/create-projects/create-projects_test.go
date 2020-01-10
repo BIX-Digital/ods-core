@@ -134,5 +134,5 @@ func CheckProjectSetup(t *testing.T) {
 			t.Error(err)
 		}
 	}
-	t.Log("WARNING: Seeding special and default permission groups is not tested yet!")
+	fmt.Printf("WARNING: Seeding special and default permission groups is not tested yet!")
 }

@@ -114,9 +114,9 @@ func TestJenkinsFile(t *testing.T) {
 		build, err = buildClient.Builds("prov-cd").Get(fmt.Sprintf("ods-corejob-create-project-%s-cicdtests-1", projectName), metav1.GetOptions{})
 		time.Sleep(2 * time.Second)
 		if err != nil {
-			t.Log("Build is still not available")
+			fmt.Printf("Build is still not available")
 		} else {
-			t.Logf("Waiting for build. Current status: %s", build.Status.Phase)
+			fmt.Printf("Waiting for build. Current status: %s", build.Status.Phase)
 		}
 		count++
 	}
