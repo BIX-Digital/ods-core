@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uex
 
-DAEMON_JSON=$(cat ./json/daemon.json)
+DAEMON_JSON=$(cat ${BASH_SOURCE%/*}/json/daemon.json)
 DAEMON_FILE_PATH="/etc/docker/daemon.json"
 
 if [ -f "${DAEMON_FILE_PATH}" ]; then
