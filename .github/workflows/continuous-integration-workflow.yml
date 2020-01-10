@@ -56,7 +56,6 @@ jobs:
       -
          name: Configure docker network and insecure registries
          run: ./tests/scripts/apply-docker-settings.sh
-         working-directory: ${{  env.GITHUB_WORKSPACE }}
       -
          name: Start OC cluster
          run: oc cluster up --base-dir=${HOME}/openshift.local.clusterup --routing-suffix 172.17.0.1.nip.io --public-hostname 172.17.0.1 --enable=centos-imagestreams --enable=persistent-volumes --enable=registry --enable=router
