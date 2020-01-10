@@ -68,8 +68,6 @@ jobs:
          run: |
           mkdir -p ods-config
           ./tests/scripts/recreate-test-infrastructure.sh
-         working-directory: ${{  env.GITHUB_WORKSPACE }}
       -
          name: Run tests
          run: make -C tests test
-         working-directory: ${{  env.GITHUB_WORKSPACE }}
