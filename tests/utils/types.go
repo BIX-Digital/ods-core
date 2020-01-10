@@ -17,3 +17,8 @@ type RoleBinding struct {
 	Namespace   string
 	RoleName    string
 }
+
+type ImageTag struct {
+	ImageName string
+	ImageTag  string
+}

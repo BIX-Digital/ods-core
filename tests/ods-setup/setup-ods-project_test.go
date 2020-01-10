@@ -61,16 +61,27 @@ func TestCreateOdsProject(t *testing.T) {
 		t.Fatalf("Error creating Image client: %s", err)
 	}
 
+	expectedImageTags := []utils.ImageTag{
+		{
+			ImageName: "jenkins-master",
+			ImageTag:  gitReference,
+		},
+		{
+			ImageName: "jenkins-slave-base",
+			ImageTag:  gitReference,
+		},
+		{
+			ImageName: "jenkins-webhook-proxy",
+			ImageTag:  gitReference,
+		},
+	}
+
 	images, err := imageClient.ImageStreams(namespace).List(metav1.ListOptions{})
-	if err = utils.FindImageTag(images, "jenkins-master", gitReference); err != nil {
-		t.Fatalf("%s\nScript:\nStdOut: %s\nStdErr: %s", err, stdout, stderr)
+
+	for _, imageTag := range expectedImageTags {
+		if err = utils.FindImageTag(images, imageTag.ImageName, imageTag.ImageTag); err != nil {
+			t.Fatalf("%s\nScript:\nStdOut: %s\nStdErr: %s", err, stdout, stderr)
+		}
 	}
 
-	if err = utils.FindImageTag(images, "jenkins-slave-base", gitReference); err != nil {
-		t.Fatalf("%s\nScript:\nStdOut: %s\nStdErr: %s", err, stdout, stderr)
-	}
-
-	if err = utils.FindImageTag(images, "jenkins-webhook-proxy", gitReference); err != nil {
-		t.Fatalf("%s\nScript:\nStdOut: %s\nStdErr: %s", err, stdout, stderr)
-	}
 }
