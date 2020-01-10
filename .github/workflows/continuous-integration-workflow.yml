@@ -8,20 +8,20 @@ jobs:
     name: ODS resources setup and provisioning tests
     runs-on: ubuntu-16.04
     steps:
-      - 
+      -
         name: GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: jq . <<< "${GITHUB_CONTEXT}"
-      - 
+      -
         name: Checkout repository
         uses: actions/checkout@v2.0.0
         with:
           fetch-depth: 0
-      - 
+      -
         name: Setup Go 1.13
         uses: actions/setup-go@v1.0.0
-        with:      
+        with:
           version: 1.13
       -
         name: Download OpenShift Client
@@ -55,7 +55,8 @@ jobs:
          run: ifconfig
       -
          name: Configure docker network and insecure registries
-         run: "sudo cat /etc/docker/daemon.json | jq '. + {\"bip\": \"172.17.0.1/16\", \"default-address-pools\": [{\"base\":\"172.17.0.0/16\",\"size\":16}], \"insecure-registries\": [\"172.30.0.0/16\"]}' | sudo tee /etc/docker/daemon.json && sudo service docker restart"
+         run: ./tests/scripts/apply-docker-settings.sh
+         working-directory: ${{  env.GITHUB_WORKSPACE }}
       -
          name: Start OC cluster
          run: oc cluster up --base-dir=${HOME}/openshift.local.clusterup --routing-suffix 172.17.0.1.nip.io --public-hostname 172.17.0.1 --enable=centos-imagestreams --enable=persistent-volumes --enable=registry --enable=router
@@ -67,7 +68,7 @@ jobs:
          run: |
           mkdir -p ods-config
           ./tests/scripts/recreate-test-infrastructure.sh
-         working-directory: ${{  env.GITHUB_WORKSPACE }}         
+         working-directory: ${{  env.GITHUB_WORKSPACE }}
       -
          name: Run tests
          run: make -C tests test
