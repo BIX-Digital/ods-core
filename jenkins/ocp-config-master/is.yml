@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: jenkins-exp-henrich
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: jenkins-master-exp-henrich
+    labels:
+      app: jenkins-exp-henrich
+  spec:
+    dockerImageRepository: jenkins-master-exp-henrich
+    lookupPolicy:
+      local: false

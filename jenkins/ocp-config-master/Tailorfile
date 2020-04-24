@@ -1,0 +1,6 @@
+namespace cd
+selector app=jenkins-exp-henrich
+param-file ../../../ods-configuration/ods-core.env
+ignore-unknown-parameters true
+
+bc,is
