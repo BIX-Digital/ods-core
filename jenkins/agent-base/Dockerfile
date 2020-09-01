@@ -79,10 +79,7 @@ RUN chmod +x /usr/local/bin/run-jnlp-client \
     && . /tmp/set_java_proxy.sh && echo $JAVA_OPTS
 
 # Add skopeo.
-RUN yum install -y \
-    http://mirror.centos.org/centos/7/extras/x86_64/Packages/containers-common-${SKOPEO_VERSION}.el7.centos.x86_64.rpm \
-    http://mirror.centos.org/centos/7/extras/x86_64/Packages/ostree-${OSTREE_VERSION}.el7.x86_64.rpm \
-    http://mirror.centos.org/centos/7/extras/x86_64/Packages/skopeo-${SKOPEO_VERSION}.el7.centos.x86_64.rpm \
+RUN yum install -y skopeo \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
     && skopeo --version
