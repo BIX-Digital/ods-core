@@ -79,10 +79,10 @@ RUN chmod +x /usr/local/bin/run-jnlp-client \
     && . /tmp/set_java_proxy.sh && echo $JAVA_OPTS
 
 # Add skopeo.
-RUN yum install -y skopeo \
-    && yum clean all \
-    && rm -rf /var/cache/yum/* \
-    && skopeo --version
+# RUN yum install -y skopeo \
+#     && yum clean all \
+#     && rm -rf /var/cache/yum/* \
+#     && skopeo --version
 
 # Fix permissions.
 RUN mkdir -p /home/jenkins/.config && chmod g+w /home/jenkins/.config \
